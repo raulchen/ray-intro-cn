@@ -46,11 +46,11 @@ class Counter(object):
 # 这个actor对象会运行在一个远程的Python进程中。
 counter = Counter.remote()
 
-# `Counter.remote`的返回值是一个ActorHandled对象。
-# 通过ActorHandle，我们可以远程调用Actor的任意一个方法。
+# `Counter.remote`的返回值是一个`ActorHandle`对象。
+# 通过`ActorHandle`，我们可以远程调用Actor的任意一个方法（actor task）。
 [counter.increment.remote() for _ in range(5)]
 
-# 一次远程actor方法调用的返回值也是一个ObjectRef对象。
+# Actor task的返回值也是一个`ObjectRef`对象。
 # 同样地，我们通过`ray.get`获取实际的数据。
 assert ray.get(counter.get_value.remote()) == 5
 
@@ -71,11 +71,11 @@ assert ray.get(obj2) == 16
 
 # 我们也可以把一个`ActorHandle`传递给一个task，
 # 从而实现在多个远程worker中同时远程调用一个actor。
-def call_counter_in_worker(counter):
+def call_actor_in_worker(counter):
     counter.increment.remote()
     return counter.get_value.remote()
 
 
 counter = Counter.remote()
-obj_refs = [call_counter_in_worker(counter) for _ in range(5)]
+obj_refs = [call_actor_in_worker(counter) for _ in range(5)]
 assert sorted(ray.get(obj_refs)) == [1, 2, 3, 4, 5]
