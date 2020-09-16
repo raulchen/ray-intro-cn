@@ -71,11 +71,12 @@ assert ray.get(obj2) == 16
 
 # 我们也可以把一个`ActorHandle`传递给一个task，
 # 从而实现在多个远程worker中同时远程调用一个actor。
+@ray.remote
 def call_actor_in_worker(counter):
     counter.increment.remote()
-    return counter.get_value.remote()
+    return 1
 
 
 counter = Counter.remote()
-obj_refs = [call_actor_in_worker(counter) for _ in range(5)]
-assert sorted(ray.get(obj_refs)) == [1, 2, 3, 4, 5]
+ray.get([call_actor_in_worker.remote(counter) for _ in range(5)])
+assert ray.get(counter.get_value.remote()) == 5

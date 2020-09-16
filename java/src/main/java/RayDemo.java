@@ -3,7 +3,6 @@ import io.ray.api.ObjectRef;
 import io.ray.api.Ray;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import org.testng.Assert;
 
@@ -28,7 +27,7 @@ public class RayDemo {
 
   public static int callActorInWorker(ActorHandle<Counter> counter) {
     counter.task(Counter::increment).remote();
-    return counter.task(Counter::getValue).remote().get();
+    return 1;
   }
 
   public static void main(String[] args) {
@@ -87,10 +86,8 @@ public class RayDemo {
       for (int i = 0; i < 5; i++) {
         objRefs.add(Ray.task(RayDemo::callActorInWorker, counter).remote());
       }
-      List<Integer> results = Ray.get(objRefs);
-      Collections.sort(results);
-      Collections.sort(Ray.get(objRefs));
-      Assert.assertEquals(results, Arrays.asList(1, 2, 3, 4, 5));
+      Ray.get(objRefs);
+      Assert.assertEquals((int) counter.task(Counter::getValue).remote().get(), 5);
     }
   }
 }
