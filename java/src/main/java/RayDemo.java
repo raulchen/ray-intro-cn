@@ -39,8 +39,7 @@ public class RayDemo {
       List<ObjectRef<Integer>> objectRefs = new ArrayList<>();
       // 通过`Ray.task(...).remote()`，我们可以把任意一个Java静态函数转化成Ray task，
       // 异步地远程执行这个函数。通过下面两行代码，我们并发地执行了5个Ray task。
-      // `remote()`的返回值是一个`ObjectRef`对象，这个对象类似一个future，
-      // 表示Task执行结果的引用。
+      // `remote()`的返回值是一个`ObjectRef`对象，表示Task执行结果的引用。
       for (int i = 0; i < 5; i++) {
         objectRefs.add(Ray.task(RayDemo::square, i).remote());
       }
@@ -53,8 +52,8 @@ public class RayDemo {
 
       // 通过`Ray.actor(...).remote`接口，我们可以基于任意一个Java class创建一个Ray actor.
       // 这个actor对象会运行在一个远程的Java进程中。
+      // 通过这个接口，我们得到一个`ActorHandle`对象。
       ActorHandle<Counter> counter = Ray.actor(Counter::new).remote();
-      // 通过上面的接口，我们得到一个`ActorHandle`对象。
       // 通过`ActorHandle`，我们可以远程调用Actor的任意一个方法（actor task）。
       for (int i = 0; i < 5; i++) {
         counter.task(Counter::increment).remote();
@@ -67,6 +66,7 @@ public class RayDemo {
     {
       // === Ray object store 示例 ===
 
+      // 显式地把一个对象放入object store。
       ObjectRef<Integer> objectRef = Ray.put(1);
       Assert.assertEquals((int) objectRef.get(), 1);
     }
@@ -83,9 +83,11 @@ public class RayDemo {
       // 从而实现在多个远程worker中同时远程调用一个actor。
       ActorHandle<Counter> counter = Ray.actor(Counter::new).remote();
       List<ObjectRef<Integer>> objRefs = new ArrayList<>();
+      // 创建5个task，同时调用counter actor的increment方法。
       for (int i = 0; i < 5; i++) {
         objRefs.add(Ray.task(RayDemo::callActorInWorker, counter).remote());
       }
+      // 等待这五个task执行完。
       Ray.get(objRefs);
       Assert.assertEquals((int) counter.task(Counter::getValue).remote().get(), 5);
     }

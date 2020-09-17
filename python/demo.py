@@ -14,9 +14,9 @@ def square(x):
 
 
 obj_refs = []
-# `squire.remote` 会异步地远程执行square函数。
+# `squire.remote` 会异步地远程执行`square`函数。
 # 通过下面两行代码，我们并发地执行了5个Ray task。
-# `square.remote`的返回值是一个`ObjectRef`对象，这个对象类似一个future，
+# `square.remote`的返回值是一个`ObjectRef`对象，
 # 表示Task执行结果的引用。
 for i in range(5):
     obj_refs.append(square.remote(i))
@@ -56,6 +56,7 @@ assert ray.get(counter.get_value.remote()) == 5
 
 # === Ray object store 示例 ===
 
+# 显式地把一个对象放入object store。
 obj_ref = ray.put(1)
 assert ray.get(obj_ref) == 1
 
@@ -74,9 +75,10 @@ assert ray.get(obj2) == 16
 @ray.remote
 def call_actor_in_worker(counter):
     counter.increment.remote()
-    return 1
 
 
 counter = Counter.remote()
+# 创建5个task，同时调用counter actor的increment方法，
+# 并等待这五个task执行完。
 ray.get([call_actor_in_worker.remote(counter) for _ in range(5)])
 assert ray.get(counter.get_value.remote()) == 5
