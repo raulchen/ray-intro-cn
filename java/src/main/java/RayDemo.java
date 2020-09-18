@@ -44,7 +44,7 @@ public class RayDemo {
         objectRefs.add(Ray.task(RayDemo::square, i).remote());
       }
       // 实际的task执行结果存放在Ray的分布式object store里，
-      // 我们可以通过`ray.get`接口，同步地获取这些数据。
+      // 我们可以通过`Ray.get`接口，同步地获取这些数据。
       Assert.assertEquals(Ray.get(objectRefs), Arrays.asList(0, 1, 4, 9, 16));
     }
     {
@@ -59,7 +59,7 @@ public class RayDemo {
         counter.task(Counter::increment).remote();
       }
       // Actor task的返回值也是一个`ObjectRef`对象。
-      // 同样地，我们通过`ray.get`获取实际的数据。
+      // 我们可以通过`ObjectRef::get`获取单个object的实际的数据。
       ObjectRef<Integer> objectRef = counter.task(Counter::getValue).remote();
       Assert.assertEquals((int) objectRef.get(), 5);
     }
@@ -87,7 +87,7 @@ public class RayDemo {
       for (int i = 0; i < 5; i++) {
         objRefs.add(Ray.task(RayDemo::callActorInWorker, counter).remote());
       }
-      // 等待这五个task执行完。
+      // 等待这五个task执行结束。
       Ray.get(objRefs);
       Assert.assertEquals((int) counter.task(Counter::getValue).remote().get(), 5);
     }

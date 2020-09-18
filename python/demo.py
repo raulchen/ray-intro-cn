@@ -14,7 +14,7 @@ def square(x):
 
 
 obj_refs = []
-# `squire.remote` 会异步地远程执行`square`函数。
+# `square.remote` 会异步地远程执行`square`函数。
 # 通过下面两行代码，我们并发地执行了5个Ray task。
 # `square.remote`的返回值是一个`ObjectRef`对象，
 # 表示Task执行结果的引用。
@@ -79,6 +79,6 @@ def call_actor_in_worker(counter):
 
 counter = Counter.remote()
 # 创建5个task，同时调用counter actor的increment方法，
-# 并等待这五个task执行完。
+# 并等待这五个task执行结束。
 ray.get([call_actor_in_worker.remote(counter) for _ in range(5)])
 assert ray.get(counter.get_value.remote()) == 5
