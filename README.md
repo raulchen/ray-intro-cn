@@ -1,4 +1,4 @@
-# 《分布式计算框架Ray介绍》示例代码
+# [《分布式计算框架Ray介绍》](https://mp.weixin.qq.com/s/rY9cC9VGft7-bMEH0_xKWQ)示例代码
 
 ## 运行Python示例代码
 
